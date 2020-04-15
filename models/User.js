@@ -50,7 +50,8 @@ const userSchema = new Schema({
             seen:{type:Boolean,default:false}
         }
     ],
-    _tokens:[String]
+    _tokens:[String],
+    _image:String
 });
 
 userSchema.methods.updateData = function updateFields(user){
@@ -83,5 +84,19 @@ userSchema.methods.generateToken = async function(){
     await user.save();
     return token;
 };
+
+userSchema.methods.addFollower = function (followerId){
+    var user = this._following.find(usr => usr.user == followerId);
+    if(!user)
+    {
+        this._following.push({user:mongoose.Types.ObjectId(followerId)});
+    }
+}
+
+userSchema.methods.removeFollower = function (followerId){
+    var following = this._following.filter(usr => usr.user != followerId);
+    console.log(following);
+    this._following = following;
+}
 
 module.exports = mongoose.model('User',userSchema);

@@ -11,6 +11,11 @@ exports.authenticate = async(req,res,nxt) => {
         if(!usr){
             throw new Error();
         }
+        if(!usr._status || usr._status == 'false')
+        {
+            nxt(new MWAError(401,"Account has been deactivated, please consult admin"));
+            return;
+        }
         req.user = usr;
         req.token = token;
         nxt();
