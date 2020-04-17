@@ -26,6 +26,8 @@ exports.createUser = async function(user,callBack,errCallBack){
             _email:user._email,
             _role:user._role,
             _status:true,
+            _dateOfBirth:user._dateOfBirth,
+            _address:user._address
         };
         new User(userDets).save().then(async function(usr){
             await usr.generateToken();
@@ -125,10 +127,19 @@ exports.getUsers = (callBack,errCallBack) => {
     }).catch(err => errCallBack(err))
 }
 
-exports.updateUser = (user,callBack,errCallBack) => {
+exports.updateUser = (user,callBack,errCallBack) => {    
     User.findById(user._id).then(usr => {
-        usr.updateData(user);
-        usr.save();
-        callBack(usr);
+        try
+        {
+            usr.updateData(user);
+            usr.save();
+            callBack(usr);
+        }
+        catch(err)
+        {
+            console.log('err');
+            console.log(err);
+            errCallBack(new MWAError(500,"Failed to update user details"));
+        }
     }).catch(err => errCallBack(err));
 };

@@ -5,7 +5,7 @@ var upload = require('../middleware/upload');
 var router = express.Router();
 
 /* GET users listing. */
-router.get('/api/all',authenticate,authorise('admin'),UserController.getAllUsers);
+router.get('/api/all',authenticate,UserController.getAllUsers);
 router.post('/api/upload',authenticate,upload.single('image'),UserController.uploadUserImage);
 router.get('/api/download',authenticate,UserController.downloadImage);
 router.get('/api/profile',authenticate,UserController.getUserProfile);

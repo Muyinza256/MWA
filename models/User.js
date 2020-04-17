@@ -51,7 +51,14 @@ const userSchema = new Schema({
         }
     ],
     _tokens:[String],
-    _image:String
+    _image:String,
+    _dateOfBirth:Date,
+    _address:{
+        _city:String,
+        _state:String,
+        _street:String,
+        _zip:String,
+    }
 });
 
 userSchema.methods.updateData = function updateFields(user){
@@ -67,13 +74,17 @@ userSchema.methods.updateData = function updateFields(user){
     {
         this._lastname = user._lastname;
     }
-    if(user._password)
-    {
-        this._password = user._password;
-    }
     if(user._username)
     {
         this._username = user._username;
+    }
+    if(user._dateOfBirth)
+    {
+        this._dateOfBirth = user._dateOfBirth;
+    }
+    if(user._address)
+    {
+        this._address = user._address;
     }
 };
 

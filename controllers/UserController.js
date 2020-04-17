@@ -10,9 +10,25 @@ function validateUser(user){
     }
 }
 
+function getUserObject(user){
+    var body = {
+        _id:user._id,
+        _username:user._username,
+        _firstname:user._firstname,
+        _lastname:user._lastname,
+        _password:user._password,
+        _email:user._email,
+        _role:user._role,
+        _status:true,
+        _dateOfBirth:Date.parse(user._dateOfBirth),
+        _address:user._address
+    };
+    return body;
+}
+
 exports.createUser = (req,res,nxt) => {
     validateUser(req.body);
-    UserService.createUser(req.body,
+    UserService.createUser(getUserObject(req.body),
         (usr) => {            
             res.json(usr);
         },
@@ -77,7 +93,7 @@ exports.activateUser = (req,res,nxt) => {
 };
 
 exports.editUser = (req,res,nxt) => {
-    UserService.updateUser(req.body,
+    UserService.updateUser(getUserObject(req.body),
         (usr) => {res.json(usr);},
         (err) => {nxt(err);});
 }
