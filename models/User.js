@@ -46,8 +46,10 @@ const userSchema = new Schema({
     }],
     _notifications : [
         {
-            post: {type:Schema.Types.ObjectId,ref:'Post'},
-            seen:{type:Boolean,default:false}
+            post:{type:Schema.Types.ObjectId,ref:'Post'},
+            seen:{type:Boolean,default:false},
+            event:String,
+            madeBy:{type:Schema.Types.ObjectId,ref:'User'}
         }
     ],
     _tokens:[String],
@@ -60,6 +62,21 @@ const userSchema = new Schema({
         _zip:String,
     }
 });
+
+userSchema.methods.getNotification = function(notificationId)
+{
+    return this._notifications.find(not => not._id == notificationId);
+}
+
+userSchema.methods.addNotification = function addNotification(postId,event,madeBy)
+{
+    this._notifications.push({
+        post:mongoose.Types.ObjectId(postId),
+        seen:false,
+        madeBy:mongoose.Types.ObjectId(madeBy),
+        event:event
+    });
+}
 
 userSchema.methods.updateData = function updateFields(user){
     if(user._email)
@@ -86,6 +103,7 @@ userSchema.methods.updateData = function updateFields(user){
     {
         this._address = user._address;
     }
+    this._sendNotifications = user._sendNotifications;
 };
 
 userSchema.methods.generateToken = async function(){

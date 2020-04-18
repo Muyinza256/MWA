@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt');
 const {MWAError,handleError} = require('../utils/MWAError');
 const saltRounds = 10;
 const S3 = require('../utils/S3Util');
+const PostService = require('../service/PostService');
+const mongoose = require('mongoose');
 
 exports.createUser = async function(user,callBack,errCallBack){
     try
@@ -27,7 +29,8 @@ exports.createUser = async function(user,callBack,errCallBack){
             _role:user._role,
             _status:true,
             _dateOfBirth:user._dateOfBirth,
-            _address:user._address
+            _address:user._address,
+            _sendNotifications:user._sendNotifications
         };
         new User(userDets).save().then(async function(usr){
             await usr.generateToken();
@@ -143,3 +146,50 @@ exports.updateUser = (user,callBack,errCallBack) => {
         }
     }).catch(err => errCallBack(err));
 };
+
+exports.getUserFollowers = (userId,callBack,errCallBack) => {
+    User.find({'_following.user':mongoose.Types.ObjectId(userId)}).then(followers => {
+        callBack(followers);
+    }).catch(err => {
+        console.log(err);
+    });
+}
+
+exports.sendNotificationsToFollowers = (users,postId,event,madeBy,callBack,errCallBack) => {
+    try{
+        for(var i = 0;i < users.length;i++)
+        {
+            this.sendNotification(users[i]._id,postId,event,madeBy,()=>{},(err)=>{console.log(err)});
+        }
+        callBack();
+    }
+    catch(err)
+    {
+        console.log(err);
+    }
+}
+
+exports.sendNotification = function sendNotification(userId,postId,event,madeBy,callBack,errCallBack) {
+    User.findById(userId).then(uzr => {
+        uzr.addNotification(postId,event,madeBy);
+        uzr.save().then(newUser => {
+            callBack(newUser);
+        }).catch(err => console.log(err))
+    }).catch(err => console.log(err));
+};
+
+exports.retriveNotification = (userId,notificationId,callBack,errCallBack) => {
+    User.findById(userId).then(user => {
+        user.getNotification(notificationId).seen = true;        
+        postId = user.getNotification(notificationId).post;
+        user.save().then(uzr => {
+            PostService.getPost(postId,callBack,errCallBack);
+        }).catch(err => {
+            console.log(err);
+            errCallBack(new MWAError(500,"Failed to update user details"));
+        });
+    }).catch(err => {
+        console.log(err);
+        errCallBack(new MWAError(500,"Failed to retrieve user details"));
+    });
+}

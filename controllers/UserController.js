@@ -21,8 +21,9 @@ function getUserObject(user){
         _role:user._role,
         _status:true,
         _dateOfBirth:Date.parse(user._dateOfBirth),
-        _address:user._address
-    };
+        _address:user._address,
+        _sendNotifications:user._sendNotifications
+    };    
     return body;
 }
 
@@ -102,4 +103,10 @@ exports.logIn = (req,res,nxt) =>{
     UserService.logIn(req.body._username,req.body._password,
         (usr) => {res.json(usr);},
         (err) => {nxt(err);});
+}
+
+exports.viewNotification = (req,res,nxt) => {
+    UserService.retriveNotification(req.user._id,req.query.notificationId,
+    (pst) => {res.json(pst);},
+    (err) => {nxt(err)});
 }
