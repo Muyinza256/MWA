@@ -2,6 +2,7 @@ const PostService = require('../service/PostService');
 const Post = require('../models/Post');
 const MWAError = require('../utils/MWAError');
 const mongoose = require('mongoose');
+const path = require('path');
 
 exports.createPost = (req,res,nxt) => {
     var post = {
@@ -18,7 +19,7 @@ exports.createPost = (req,res,nxt) => {
 }
 
 exports.uploadPostImage = (req,res,nxt) => {
-    var fileExtenstion = path.extname(req.file.originalname).toLowerCase();
+    var fileExtension = path.extname(req.file.originalname).toLowerCase();
     PostService.addImage(req.query.postId,req.file.buffer,fileExtension,(pst) => {
         res.json(pst);
     },err => {
@@ -61,8 +62,26 @@ exports.removeLike = (req,res,nxt) => {
 exports.getPosts = (req,res,nxt) => {
     if(req.user._role == 'admin')
     {
-        PostService.getAllPosts(req.query.offset,req.query.limit,(posts)=>{res.json(posts)},(err)=>{nxt(err)});
+        if(req.query.search)
+        {
+            PostService.getAllPostsWithSearch(req.query.search,req.query.offset,req.query.limit,(posts)=>{res.json(posts)},(err)=>{nxt(err)});
+        }
+        else
+        {
+            PostService.getAllPosts(req.query.offset,req.query.limit,(posts)=>{res.json(posts)},(err)=>{nxt(err)});
+        }
     }else{
-        PostService.getPosts(req.user,req.query.offset,req.query.limit,(posts)=>{res.json(posts)},(err)=>{nxt(err)});
+        if(req.query.search)
+        {
+            PostService.getPostsWithSearch(req.user,req.query.search,req.query.offset,req.query.limit,(posts)=>{res.json(posts)},(err)=>{nxt(err)});    
+        }
+        else
+        {
+            PostService.getPosts(req.user,req.query.offset,req.query.limit,(posts)=>{res.json(posts)},(err)=>{nxt(err)});
+        }
     }
+}
+
+exports.uncensurePost = (req,res,nxt) => {
+    PostService.unCensurePost(req.query.id,post => res.json(post),err => nxt(err));
 }

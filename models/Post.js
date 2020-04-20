@@ -22,7 +22,9 @@ const postSchema = new Schema({
         state:String,
         city:String,
         zip:String
-    }
+    },
+    _censured:{type:Boolean,default:false},
+    _healthy:{type:Boolean,default:true}
 });
 
 postSchema.methods.addLike = function(userId)

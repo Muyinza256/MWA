@@ -11,5 +11,6 @@ router.post('/api/unComment',authenticate,PostController.removeComment);
 router.post('/api/like',authenticate,PostController.addLike);
 router.post('/api/unlike',authenticate,PostController.removeLike);
 router.get('/api/get',authenticate,PostController.getPosts);
+router.put('/api/unCensure',authenticate,authorise('admin'),PostController.uncensurePost);
 
 module.exports = router;

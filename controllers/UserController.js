@@ -2,6 +2,7 @@ const UserService = require('../service/UserService');
 const {MWAError,handleError} = require('../utils/MWAError');
 const validator = require('validator');
 const path = require('path');
+const AdminService = require('../service/AdminService');
 
 function validateUser(user){
     if(!validator.isEmail(user._email))
@@ -109,4 +110,8 @@ exports.viewNotification = (req,res,nxt) => {
     UserService.retriveNotification(req.user._id,req.query.notificationId,
     (pst) => {res.json(pst);},
     (err) => {nxt(err)});
+}
+
+exports.createUnblockRequest = (req,res,nxt) => {
+    AdminService.createUnblockRequest(req.user._id,req.body._unblockText,data=>res.json(data),err=>nxt(err));
 }

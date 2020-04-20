@@ -91,7 +91,7 @@ exports.downloadImage = async function(file,callBack,errCallBack){
 }
 
 exports.getUser = async function(id,callBack,errCallBack){
-    User.findById(id).populate('_following.user').then(usr => {
+    User.findById(id).populate('_following.user').populate('_notifications.madeBy').then(usr => {
         callBack(usr);
     }).catch(err => {
         errCallBack(new MWAError(404,"User not found"));
@@ -101,14 +101,10 @@ exports.getUser = async function(id,callBack,errCallBack){
 exports.logIn = async function(username,password,callBack,errCallBack){
     try
     {
-        var usr = await User.findOne({_username:username});
+        var usr = await User.findOne({_username:username}).populate('_notifications.madeBy');
         if(!usr)
         {
             errCallBack(new MWAError(401,"Username doesnt match anyone's account"));
-        }
-        if(!usr._status || usr._status == 'false')
-        {
-            errCallBack(new MWAError(401,"Account has been deactivated, please consult admin"));
         }
         const doesPasswordMatch = await bcrypt.compare(password,usr._password);
         if(!doesPasswordMatch)

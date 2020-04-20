@@ -15,7 +15,9 @@ router.post('/api/deactivateUser',authenticate,authorise('admin'),UserController
 router.post('/api/activateUser',authenticate,authorise('admin'),UserController.activateUser);
 router.post('/api/create',UserController.createUser);
 router.post('/api/login',UserController.logIn);
+router.post('/api/requestUnblock',authenticate,UserController.createUnblockRequest);
 router.put('/api/edit',authenticate,UserController.editUser);
 router.get('/api/viewNotification',authenticate,UserController.viewNotification)
+
 
 module.exports = router;
